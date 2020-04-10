@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+
+    <persistence-unit name="my_persistence_unit" transaction-type="JTA"> <!-- RESOURCE_LOCAL OR JTA -->
+        <description>
+            Persistence unit for the JPA configuration
+        </description>
+        <!--<provider>org.hibernate.ejb.HibernatePersistence</provider>-->
+        <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider> -->
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> <!-- DOESN'T WORK?? -->
+        
+        <jta-data-source>java:comp/env/jdbc/quantPersistence</jta-data-source>
+        
+        
+      <!--  <class>org.halyph.sessiondemo.Event</class> -->
+      <!--
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/jpatestdb" />
+            <property name="javax.persistence.jdbc.user" value="root" />
+            <property name="javax.persistence.jdbc.password" value="root" />
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.hbm2ddl.auto" value="create" />
+        </properties>
+        -->
+        <properties>
+            <!-- Propietary properties; trying first with generic ones -->
+            <!--
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables" /> 
+            <property name="eclipselink.create-ddl-jdbc-file-name" value="create_schema.sql"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="both" />
+            -->
+            
+            <!--<property name="eclipselink.ddl-generation" value="create-or-extend-tables" />  -->
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables" />  
+
+            <property name="eclipselink.ddl-generation.output-mode" value="database" />
+            
+            <!-- NOTE: ALL javax.persistence. properties seems to be ignored, do not why :-( -->
+            
+            <!-- Properties for when we have scripts for generating the schema -->
+            <!-- Defines if the persistence provider shall also create the required database schemas or only the other database objects like tables, sequences, etc.. -->
+            <!-- IT SHOULD WORK! BUT... -->
+            <!--<property name="javax.persistence.schema-generation.create-database-schemas" value="true" />
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create-tables" />
+            <property name="javax.persistence.schema-generation.create-source" value="script-then-metadata" />
+            <property name="javax.persistence.schema-generation.create-script-source" value="create_schema.sql" />
+-->
+
+<!--
+            <property name="javax.persistence.schema-generation.create-database-schemas" value="true" />
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create-tables" /> 
+            <property name="javax.persistence.schema-generation.create-source" value="metadata" />
+-->
+<!--
+            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+            <property name="javax.persistence.database-product-name" value="MySQL" />
+            <property name="javax.persistence.database-major-version" value="8" />
+
+            <property name="javax.persistence.schema-generation.create-source" value="script" />
+            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/create_views.sql" />
+-->
+
+            <!-- Properties for when we want to generate the scripts based on our entities -->
+            <!--
+            <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create" />
+            <property name="javax.persistence.schema-generation.scripts.create-target" value="create_schema.sql" />
+-->
+            
+
+            <!-- Defines which scripts the persistence provider shall create. -->
+            <!--
+            <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create" />
+            <property name="javax.persistence.schema-generation.scripts.create-target" value="META-INF/sql_create.sql" />
+            <property name="javax.persistence.schema-generation.scripts.drop-target" value="META-INF/sql_drop.sql" />
+            -->
+            <!-- If we want to load existent data into the database , we have to enable this property: -->
+            <!--<property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/> -->
+            
+            
+            <!-- TODO: For perfomance reasons eclipselink.weaving should be true, but it requires a lot of configuration so I will pospone it temorarily -->
+            <property name="eclipselink.weaving" value="false"/>
+            
+            
+            <!-- For debugging purposes, if we want to log everything happening into the ddbb: -->
+               <!-- FULL LOGGING -->
+               <!--              
+            <property name="eclipselink.logging.level" value="ALL" />
+            <property name="eclipselink.logging.level.jpa" value="ALL" />
+            <property name="eclipselink.logging.level.ddl" value="ALL" />
+            <property name="eclipselink.logging.level.connection" value="ALL" />
+            <property name="eclipselink.logging.level.sql" value="ALL" />
+            <property name="eclipselink.logging.level.transaction"
+                value="ALL" />
+            <property name="eclipselink.logging.level.sequencing" value="ALL" />
+            <property name="eclipselink.logging.level.server" value="ALL" />
+            <property name="eclipselink.logging.level.query" value="ALL" />
+            <property name="eclipselink.logging.level.properties" value="ALL" />
+            -->
+            <!-- BASIC LOGGING -->
+            <property name="eclipselink.logging.level" value="INFO"/>
+            <property name="eclipselink.logging.level.sql" value="INFO"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            
+        </properties>
+    </persistence-unit>
+
+</persistence>
