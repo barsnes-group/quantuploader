@@ -76,9 +76,7 @@ public class JPAConfig {
     @Bean(name="dataSource",destroyMethod="") // fix an Spring error closing de dataSource before than expected
     public DataSource dataSource() throws NamingException {
         
-       // TODO: TO RECOVER: String jndiName = env.getProperty("spring.datasource.jndi-name");
-        String jndiName = "java:comp/env/jdbc/quantPersistence";
-        
+        String jndiName = env.getProperty("spring.datasource.jndi-name");
         DataSource datasource = null;
         try {
             datasource = (DataSource)(new JndiTemplate().lookup(jndiName));
