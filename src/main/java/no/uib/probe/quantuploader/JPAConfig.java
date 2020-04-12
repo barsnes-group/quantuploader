@@ -2,9 +2,7 @@ package no.uib.probe.quantuploader;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,6 @@ public class JPAConfig {
       throws NamingException {
         LocalContainerEntityManagerFactoryBean em 
           = new LocalContainerEntityManagerFactoryBean();
-        //em.setDataSource(dataSource());
         em.setDataSource(dataSource());
         em.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
         // it's mandatory if we want to have functionalities like custom transaction isolation
