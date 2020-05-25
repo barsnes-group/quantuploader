@@ -1,6 +1,6 @@
 -- THIS SQL IS INTENDED FOR DATA LOADING, SO IT RUNS AFTER THE SCHEMA AND TABLES ARE CREATED.
 
-# TODO: diseasescategory enum should be removed in order to use always just this info:
+-- TODO: diseasescategory enum should be removed in order to use always just this info:
 
 INSERT IGNORE INTO `disease_groups` 
 VALUES ('AD','Alzheimer\'s disease',1),('ALS','Amyotrophic Lateral Sclerosis',2),
@@ -19,7 +19,7 @@ VALUES ('AD','Alzheimer\'s disease',1,1),
 ('CIS-MS(CIS)','Clinically isolated syndrome, with and without conversion to multiple sclerosis included',10,3),
 ('Cogn. Healthy','Cognitively healthy',11,1),
 ('FTD','Frontotemporal dementia',12,1),
-('Healthy','Healthy',13,1),
+('Healthy_AD','Healthy',13,1),
 ('LBD','Lewy body dementia',14,1),
 ('MCI','Mild cognitive impairment',15,1),
 ('MCI nonprogressors','Mild cognitive impairment, without conversion to Alzheimer\'s disease',16,1),
@@ -56,6 +56,6 @@ VALUES ('AD','Alzheimer\'s disease',1,1),
 ('SPMS','Secondary-progressive multiple sclerosis',47,3),
 ('SPMS Lamotri.','Secondary-progressive multiple sclerosis after Lamotrigine treatment',48,3),
 ('Sympt. Controls','Symptomatic controls',49,3),
-('Healthy','Healthy',50,2),
-('Healthy','Healthy',51,3),
-('Healthy','Healthy',52,4);
+('Healthy_ALS','Healthy',50,2),
+('Healthy_MS','Healthy',51,3),
+('Healthy_PD','Healthy',52,4);
