@@ -50,7 +50,18 @@ public class QuantDataSaverService implements Serializable {
         private String lastRunningError;
 
 	public QuantDataSaverService() {  
+            initialiseDataStructures();
 	}
+        
+        public void initialiseDataStructures(){
+            globalWaitingHandler = null;  
+            studiesWaitingHandler = null;
+            proteinsWaitingHandler = null;
+            datasetsWaitingHandler = null;
+            datasetProteinsWaitingHandler = null;
+            datasetPeptidesWaitingHandler = null;
+            lastRunningError = "";
+        }
         
         public WaitingHandler getRefreshedWaitingHandler(){
             int accumulated = 0;

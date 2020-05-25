@@ -61,11 +61,11 @@ public class QuantDataExcelLoaderService {
     
     private static final Logger LOGGER = Logger.getLogger(QuantDataSaverService.class.getName());
 
-    private HashMap<String,QuantStudyBean> studies = new HashMap<String,QuantStudyBean>();
-    private HashMap<String,QuantDatasetBean> datasets = new HashMap<String,QuantDatasetBean>();
-    private HashMap<String,QuantProteinBean> proteins = new HashMap<String,QuantProteinBean>();
-    private HashMap<String,QuantDatasetProteinBean> datasetProteins = new HashMap<String,QuantDatasetProteinBean>();
-    private HashMap<String,QuantDatasetPeptideBean> datasetPeptides = new HashMap<String,QuantDatasetPeptideBean>();
+    private HashMap<String,QuantStudyBean> studies;
+    private HashMap<String,QuantDatasetBean> datasets;
+    private HashMap<String,QuantProteinBean> proteins;
+    private HashMap<String,QuantDatasetProteinBean> datasetProteins;
+    private HashMap<String,QuantDatasetPeptideBean> datasetPeptides;
 
 
     private WaitingHandler waitingHandler;     
@@ -73,6 +73,15 @@ public class QuantDataExcelLoaderService {
     
     public QuantDataExcelLoaderService() {
         waitingHandler = new WaitingHandlerCLIImpl();
+        initialiseDataStructures();
+    }
+    
+    public void initialiseDataStructures(){
+        studies = new HashMap<String,QuantStudyBean>();
+        datasets = new HashMap<String,QuantDatasetBean>();
+        proteins = new HashMap<String,QuantProteinBean>();
+        datasetProteins = new HashMap<String,QuantDatasetProteinBean>();
+        datasetPeptides = new HashMap<String,QuantDatasetPeptideBean>();
     }
 
     

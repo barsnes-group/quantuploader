@@ -1,6 +1,7 @@
 package no.uib.probe.quantuploader.components;
 
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DomEvent;
 import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.html.Div;
@@ -12,6 +13,9 @@ import com.vaadin.flow.component.upload.FileRejectedEvent;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.dom.DomEventListener;
+import com.vaadin.flow.dom.Element;
+import elemental.json.JsonObject;
 import java.util.logging.Logger;
 import no.uib.probe.quantuploader.enums.ComponentStatus;
 
@@ -50,6 +54,15 @@ public class UploadCustomComponent extends VerticalLayout {
         uploader.addSucceededListener(getFileSucceededEventListener());
         uploader.addFileRejectedListener(getFileRejectedListener());
         uploader.addFailedListener(getFileFailedEventListener());
+ 
+        uploader.getElement().addEventListener("file-remove", event -> {
+            // evenData has all info about the removed file. ie:
+            //JsonObject eventData = event.getEventData();
+            // System.out.println("Removed " + eventData.getString("event.detail.file.name"));
+            setVisualStatus(ComponentStatus.NOT_STARTED);
+            this.parentView.initialiseImportComponent();
+            
+        });//.addEventData("event.detail.file.name");
         
         //@formatter:on
         uploader.setId("test-upload");
@@ -61,7 +74,7 @@ public class UploadCustomComponent extends VerticalLayout {
         add(uploader);
         add(outputInfo);
             
-        setVisualStatus(ComponentStatus.NOT_INITIALIZED);
+        setVisualStatus(ComponentStatus.NOT_STARTED);
         System.out.println("end LoadView");
 
     }
@@ -92,7 +105,7 @@ public class UploadCustomComponent extends VerticalLayout {
     private void setVisualStatus(ComponentStatus componentStatus, String extraMessage){
         String fullMessage = "";
         switch(componentStatus){
-            case NOT_INITIALIZED:
+            case NOT_STARTED:
                 initializeSubcomponents();
                 break;
             case RUNNING:                

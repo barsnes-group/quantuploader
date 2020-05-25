@@ -10,5 +10,5 @@ package no.uib.probe.quantuploader.enums;
  * @author carlos.horro
  */
 public enum ComponentStatus {
-        NOT_INITIALIZED, RUNNING, FINISHED, PREVIOUS_ERROR, RUNNING_ERROR, CANCELLED
+        NOT_STARTED, RUNNING, FINISHED, PREVIOUS_ERROR, RUNNING_ERROR, CANCELLED
 }

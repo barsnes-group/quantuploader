@@ -1,6 +1,5 @@
 package no.uib.probe.quantuploader.components;
 
-//import ch.carnet.kasparscherrer.VerticalScrollLayout;
 import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.html.Div;
@@ -13,8 +12,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import no.uib.probe.quantuploader.enums.ComponentStatus;
-
-//import org.vaadin.addons.collapsiblepanel.CollapsiblePanel;
 
 
 /**
@@ -78,20 +75,11 @@ public class DBLoadComponent extends VerticalLayout  {
         add(errorDetailsPanel);
         
         
-        initializeSubcomponents();
+        notifyInitialiseDBLoadingComponent();
         LOGGER.log(Level.FINE, "end DBLoaderComponent");
 
     }
     
-    /**
-     * Initializes all component structures.
-     */
-    private void initializeSubcomponents(){
-        setVisualStatus(ComponentStatus.NOT_INITIALIZED,"","");
-        // presenter may still be null if we are just starting the app.
-        //if (this.parentView.getPresenter() != null)
-            //this.parentView.getPresenter().finishDBLoadingPendingTasks();
-    }
     
     /**
      * Method that adapts component visual status to the working status of its
@@ -122,7 +110,7 @@ public class DBLoadComponent extends VerticalLayout  {
     private void setVisualStatus(ComponentStatus componentStatus, String extraMessage, String errorDetails){
         String fullMessage = "";
         switch(componentStatus){
-            case NOT_INITIALIZED:
+            case NOT_STARTED:
                 fullMessage = "Waiting for importing..."+((extraMessage != null)?" "+extraMessage:"");
                 parentView.getMainUI().access(() ->  {
                     processProgressBar.setMax(1);
@@ -177,6 +165,20 @@ public class DBLoadComponent extends VerticalLayout  {
                 
         }
         this.componentStatus = componentStatus;
+    }
+    
+    
+    /**
+     * Initializes all component structures.
+     */
+    public void notifyInitialiseDBLoadingComponent(){
+        setVisualStatus(ComponentStatus.NOT_STARTED,null,null);
+        // presenter may still be null if we are just starting the app.
+        if (this.parentView.getPresenter() != null){
+            this.parentView.getPresenter().initialiseDBLoadingData();
+            this.parentView.getPresenter().finishDBLoadingPendingTasks();
+        }
+        
     }
     
     /**
@@ -269,8 +271,8 @@ public class DBLoadComponent extends VerticalLayout  {
      */
     private void refreshOutputInfo(String text) {
         parentView.getMainUI().access(() -> {
+            outputInfo.removeAll();
             if (text != null){
-                outputInfo.removeAll();
                 HtmlComponent htmlParagraph = new HtmlComponent(Tag.P);
                 htmlParagraph.getElement().setText(text);
                 outputInfo.add(htmlParagraph);
@@ -292,6 +294,9 @@ public class DBLoadComponent extends VerticalLayout  {
                     errorDetailsPanel.setVisible(true);
                 errorDetailsPanel.setValue(details);
 
+            }else{    
+                errorDetailsPanel.setValue("");
+                errorDetailsPanel.setVisible(false);
             }
         });
     }

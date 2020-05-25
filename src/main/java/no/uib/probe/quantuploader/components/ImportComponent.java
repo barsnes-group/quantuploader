@@ -1,23 +1,14 @@
 package no.uib.probe.quantuploader.components;
 
-import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.progressbar.ProgressBarVariant;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Panel;
 import java.io.InputStream;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import no.uib.probe.quantuploader.enums.ComponentStatus;
 
@@ -72,18 +63,9 @@ public class ImportComponent /* HorizontalLayout */ extends VerticalLayout  {
         mainBodyContainer.add(processProgressBar);
         
         System.out.println("end ImportComponent");
-        initializeSubcomponents();
+        notifyInitialiseImportComponent();
     }
     
-    /**
-     * Initializes all component structures.
-     */
-    private void initializeSubcomponents(){
-        setVisualStatus(ComponentStatus.NOT_INITIALIZED);
-        // presenter may still be null if we are just starting the app.
-        if (this.parentView.getPresenter() != null)
-            this.parentView.getPresenter().finishImportingPendingTasks();
-    }
     
     /**
      * Method that adapts component visual status to the working status of its
@@ -103,7 +85,7 @@ public class ImportComponent /* HorizontalLayout */ extends VerticalLayout  {
     private void setVisualStatus(ComponentStatus componentStatus, String extraMessage){
         String fullMessage = "";
         switch(componentStatus){
-            case NOT_INITIALIZED:
+            case NOT_STARTED:
                 fullMessage = "Waiting for uploading..."+((extraMessage != null)?" "+extraMessage:"");
                 parentView.getMainUI().access(() ->  {
                     processProgressBar.setMax(1);
@@ -120,7 +102,7 @@ public class ImportComponent /* HorizontalLayout */ extends VerticalLayout  {
                 });
                 break;
             case FINISHED:
-                fullMessage = "Data properly imported"+((extraMessage != null)?": "+extraMessage:"");
+                fullMessage = "Importing finished"+((extraMessage != null)?": "+extraMessage:"");
                 refreshOutputInfo(fullMessage);
                 parentView.getMainUI().access(() ->  {
                     processProgressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
@@ -148,6 +130,21 @@ public class ImportComponent /* HorizontalLayout */ extends VerticalLayout  {
         }
         this.componentStatus = componentStatus;
     }
+    
+    
+    /**
+     * Initializes all component structures.
+     */
+    public void notifyInitialiseImportComponent(){
+        setVisualStatus(ComponentStatus.NOT_STARTED);
+        // presenter may still be null if we are just starting the app.
+        if (this.parentView.getPresenter() != null){
+            this.parentView.getPresenter().finishImportingPendingTasks();
+            //this.parentView.getPresenter().initialiseDBLoadingData();
+            this.parentView.initialiseDBLoadingComponent();
+        }
+    }
+    
     
     /**
      * Receives a notification about the import of an excel file must start.

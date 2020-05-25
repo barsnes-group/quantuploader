@@ -91,12 +91,27 @@ public class UploadView extends HorizontalLayout implements View  {
     }
     
     /**
+     * Initialises import component
+     */
+    public void initialiseImportComponent(){
+        myImportComponent.notifyInitialiseImportComponent();
+    }
+    
+    
+    /**
      * Coordinates the required actions to start the excel data import.
      * @param inputStream
      * @param fileName 
      */
     public void startImport(InputStream inputStream, String fileName){
         myImportComponent.notifyStartImport(inputStream, fileName);
+    }
+    
+    /**
+     * Initialises db loading component
+     */
+    public void initialiseDBLoadingComponent(){
+        myDBLoaderComponent.notifyInitialiseDBLoadingComponent();
     }
     
     /**
