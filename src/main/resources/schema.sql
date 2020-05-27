@@ -21,6 +21,18 @@ CREATE TABLE IF NOT EXISTS `disease_groups` (
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `disease_groups_alias` (
+  `alias` varchar(100) NOT NULL DEFAULT ' ',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `disease_group` int NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (disease_group) REFERENCES disease_groups(id),
+  UNIQUE KEY `alias_UNIQUE` (`alias`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE IF NOT EXISTS `diseases` (
   `min` varchar(100) NOT NULL DEFAULT ' ',
   `full` varchar(500) NOT NULL DEFAULT ' ',

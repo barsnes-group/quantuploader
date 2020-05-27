@@ -6,6 +6,14 @@ INSERT IGNORE INTO `disease_groups`
 VALUES ('AD','Alzheimer\'s disease',1),('ALS','Amyotrophic Lateral Sclerosis',2),
 ('MS','Multiple sclerosis',3),('PD','Parkinson\'s disease',4);
 
+INSERT IGNORE INTO `disease_groups_alias` 
+VALUES ('AD',1,1),
+('PD',2,4),
+('Parkinson',3,4),
+('ALS',4,2),
+('MS',5,3);
+
+
 INSERT IGNORE INTO `diseases` 
 VALUES ('AD','Alzheimer\'s disease',1,1),
 ('AD dementia\r\n','Alzheimer\'s disease dementia',2,1),
