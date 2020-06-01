@@ -50,7 +50,6 @@ public class QuantDataSaverService implements Serializable {
         private String lastRunningError;
 
 	public QuantDataSaverService() {  
-            initialiseDataStructures();
 	}
         
         public void initialiseDataStructures(){

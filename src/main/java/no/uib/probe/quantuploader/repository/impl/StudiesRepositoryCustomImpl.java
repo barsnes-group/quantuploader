@@ -17,6 +17,7 @@ import no.uib.probe.quantuploader.repository.StudiesRepositoryCustom;
 import org.springframework.transaction.annotation.Propagation;
 
 import javax.annotation.PostConstruct;
+import no.uib.probe.quantuploader.beans.DiseaseBean;
 import no.uib.probe.quantuploader.repository.RepoReturnInfo;
 import no.uib.probe.quantuploader.repository.StudiesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -347,6 +348,46 @@ public class StudiesRepositoryCustomImpl implements StudiesRepositoryCustom{
     
     
     
+    /**
+     * Utility method that returns an array of dataset ids if they exist, using .
+     * @param diseaseGroupAcronym
+     * @param diseaseAcronym1
+     * @param diseaseAcronym2
+     * @return 
+     */
+    @Override
+    public List<Long> getDatasetDBIdsByDiseases(
+            String diseaseGroupAcronym, 
+            String diseaseAcronym1, 
+            String diseaseAcronym2) {
+        
+        if (diseaseGroupAcronym == null || diseaseAcronym1 == null || diseaseAcronym2 == null)
+            return null;
+        
+        /*
+        As there may be different disease groups when having one disease acronym
+        (ie: "health" disease), we must always include the disease group acronym
+        into the query.
+        */
+        String stringQuery = 
+                    "SELECT d.id FROM " + QuantDatasetBean.class.getName()+" d LEFT JOIN d.quantStudyBean s "+
+                    " WHERE s.diseaseGroupAcronym = :diseaseGroupAcronym ";
+        
+        stringQuery = stringQuery +
+                " AND d.patientsSubGroup1 = :patientsSubgroup1"+
+                " AND d.patientsSubGroup2 = :patientsSubgroup2";
+
+            
+        javax.persistence.Query query = entityManager
+                .createQuery(stringQuery)
+                .setParameter("patientsSubgroup1", diseaseAcronym1)
+                .setParameter("patientsSubgroup2", diseaseAcronym2);
+        query.setParameter("diseaseGroupAcronym", diseaseGroupAcronym);
+                
+                
+        return (List<Long>)query.getResultList();
+        
+    }
     
 
     // Example of a custom query

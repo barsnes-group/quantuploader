@@ -35,7 +35,10 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import no.uib.probe.quantuploader.beans.DiseaseGroupAliasBean;
+import no.uib.probe.quantuploader.beans.DiseaseGroupBean;
 import no.uib.probe.quantuploader.enums.DiseaseCategory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
@@ -59,6 +62,9 @@ public class QuantDataExcelLoaderService {
         }
     }
     
+    @Autowired
+    private QuantDiseasesDBUtilitiesService quantDiseasesDBUtilitiesService;
+    
     private static final Logger LOGGER = Logger.getLogger(QuantDataSaverService.class.getName());
 
     private HashMap<String,QuantStudyBean> studies;
@@ -67,21 +73,22 @@ public class QuantDataExcelLoaderService {
     private HashMap<String,QuantDatasetProteinBean> datasetProteins;
     private HashMap<String,QuantDatasetPeptideBean> datasetPeptides;
 
+    private HashMap<String,DiseaseGroupBean> diseaseGroupsByAlias = null;
 
     private WaitingHandler waitingHandler;     
 
     
     public QuantDataExcelLoaderService() {
-        waitingHandler = new WaitingHandlerCLIImpl();
-        initialiseDataStructures();
     }
     
     public void initialiseDataStructures(){
+        waitingHandler = new WaitingHandlerCLIImpl();
         studies = new HashMap<String,QuantStudyBean>();
         datasets = new HashMap<String,QuantDatasetBean>();
         proteins = new HashMap<String,QuantProteinBean>();
         datasetProteins = new HashMap<String,QuantDatasetProteinBean>();
         datasetPeptides = new HashMap<String,QuantDatasetPeptideBean>();
+        diseaseGroupsByAlias = quantDiseasesDBUtilitiesService.getAllDiseaseGroupsByAlias();
     }
 
     
@@ -115,7 +122,7 @@ public class QuantDataExcelLoaderService {
      * @param excelFilePath String path to the source excel file.
      * @return 
      */
-    @Async // run in a separate thread
+    //@Async // run in a separate thread
     public synchronized HashMap<String,QuantStudyBean> importModelFromExcelFile(String excelFilePath) {
         LOGGER.log(Level.INFO, ">> LOADING QUANTDATAEXCELLOADERSERVICE SERVICE CALL BY FILEPATH: {0}", excelFilePath);
 
@@ -192,6 +199,8 @@ public class QuantDataExcelLoaderService {
         
         LOGGER.log(Level.INFO, ">> QUANTDATAEXCELLOADERSERVICE STARTING IMPORTING PROCESS ", excelFileName);
 
+        System.out.println(">> QUANTDATAEXCELLOADERSERVICE STARTING IMPORTING PROCESS "+ excelFileName+"; numRows:"+numRows);
+
         
         while (rowIterator.hasNext()) {    
             currentRow = rowIterator.next();
@@ -256,7 +265,8 @@ public class QuantDataExcelLoaderService {
 
         
         showFinalReport();
-        waitingHandler.setRunFinished();
+        if (!waitingHandler.isRunCanceled())
+            waitingHandler.setRunFinished();
 
         return studies;
     }
@@ -309,6 +319,15 @@ public class QuantDataExcelLoaderService {
 
                 // This code should replace well Yehia's code
                 quantStudyBean.setDiseaseCategory(DiseaseCategory.getDiseaseGroupByInput(getStringValue.apply(Column.DISEASE_GROUP_CAT)));
+                
+                DiseaseGroupBean diseaseGroupBean = diseaseGroupsByAlias.get(getStringValue.apply(Column.DISEASE_GROUP_CAT));
+                
+                if (diseaseGroupBean != null)
+                    quantStudyBean.setDiseaseGroupAcronym(diseaseGroupBean.getAcronym());
+                else
+                    LOGGER.log(Level.INFO, "Disease Group category with acronym '"+getStringValue.apply(Column.DISEASE_GROUP_CAT)+"' does not exist");
+                
+                
                 /*
                 if (updatedRowArr[index] == null || updatedRowArr[index].trim().equalsIgnoreCase("")) {
                     qProt.setDiseaseCategory(" ");
@@ -382,6 +401,7 @@ public class QuantDataExcelLoaderService {
 
             quantDatasetBean.setPatientsGroup1(getStringValue.apply(Column.PG1));              
 
+            // TODO: SHOULD IT BE COMPARED TO DISEASES TABLES?
             quantDatasetBean.setPatientsSubGroup1(getStringValue.apply(Column.PSG1));              
 
             quantDatasetBean.setPatientsGroup1Comm(getStringValue.apply(Column.PG1_COMMENT));   
@@ -390,6 +410,7 @@ public class QuantDataExcelLoaderService {
 
             quantDatasetBean.setPatientsGroup2(getStringValue.apply(Column.PG2));              
 
+            // TODO: SHOULD IT BE COMPARED TO DISEASES TABLES?
             quantDatasetBean.setPatientsSubGroup2(getStringValue.apply(Column.PSG2));              
 
             quantDatasetBean.setPatientsGroup2Comm(getStringValue.apply(Column.PG2_COMMENT));    
@@ -447,8 +468,6 @@ public class QuantDataExcelLoaderService {
                 
             quantProteinBean.setUniprotProteinName(getStringValue.apply(Column.PROTEIN_NAME_UNIPROT));
 
-
-            
             proteins.put(quantProteinBean.getUniqLogicId(), quantProteinBean);
         }else {
             LOGGER.log(Level.FINER, "loadProteinBean: reusing quantProteinBean {0}", quantProteinBean.getUniqLogicId());
@@ -484,7 +503,6 @@ public class QuantDataExcelLoaderService {
         
         String currentDatasetProteinKey = getUniqueIdStringByBeanClassAndRow(QuantDatasetProteinBean.class,getStringValue);
 
-        //String currentDatasetProteinKey = getStringValue.apply(Column.STUDY_KEY)+"_"+getStringValue.apply(Column.ACCESSION_PROT); // TODO: REVIEW ID!!
         QuantDatasetProteinBean datasetProteinBean = datasetProteins.get(currentDatasetProteinKey);
         
         if (datasetProteinBean == null){

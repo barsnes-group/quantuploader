@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import no.uib.probe.quantuploader.services.QuantDataExcelLoaderService;
 import no.uib.probe.quantuploader.services.QuantDataSaverService;
-//import no.uib.probe.quantuploader.services.QuantDiseasesComparisonUpdaterService;
+import no.uib.probe.quantuploader.services.QuantDiseasesComparisonUpdaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextStoppedEvent;
 
@@ -35,9 +35,9 @@ public class UploadImportSavePresenter
     private QuantDataExcelLoaderService excelLoaderService;
     @Autowired
     private QuantDataSaverService dataSaverService;
-    //@Autowired
-    //private QuantDiseasesComparisonUpdaterService diseasesComparisonUpdaterService;
-       
+    @Autowired
+    private QuantDiseasesComparisonUpdaterService diseasesComparisonUpdaterService;
+   
     
     private Timer importingTimerMonitoring;
     
@@ -123,7 +123,14 @@ public class UploadImportSavePresenter
                 if (inputStream == null){
                     importComponent.notifyUploadingError("Data from uploaded file was not properly received");
                 }else{      
-                    importingTimerMonitoring = startProcessingTimerMonitoring(importComponent);
+                    System.out.println("ImportDataThread - initialiseDataStructures");
+                    LOGGER.log(Level.FINEST, "ImportDataThread - initialiseDataStructures");
+                    excelLoaderService.initialiseDataStructures();
+                    System.out.println("ImportDataThread - startImportingTimerMonitoring");
+                    LOGGER.log(Level.FINEST, "ImportDataThread - startImportingTimerMonitoring");
+                    importingTimerMonitoring = startImportingTimerMonitoring(importComponent);
+                    System.out.println("ImportDataThread - importModelFromExcelFile");
+                    LOGGER.log(Level.FINEST, "ImportDataThread - importModelFromExcelFile");
                     excelLoaderService.importModelFromExcelFile(inputStream, fileName);
                 }
             } finally {
@@ -139,7 +146,7 @@ public class UploadImportSavePresenter
      * The timer MUST be removed when the app is destroyed.
      * @return The timer (already started).
      */
-    private Timer startProcessingTimerMonitoring(ImportComponent importComponent){
+    private Timer startImportingTimerMonitoring(ImportComponent importComponent){
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -150,6 +157,9 @@ public class UploadImportSavePresenter
 
                 if (excelLoaderService.getWaitingHandler().isRunCanceled()){
                     importComponent.notifyCancellation();
+                }else if (excelLoaderService.getWaitingHandler().isRunFinished()){
+                    importComponent.notifyUploadingProgress(0, 0);
+                    importComponent.notifyEnding("no records available to be imported");
                 }else{
                     if (maxRecords > 0){
                         importComponent.notifyUploadingProgress(currentRecord, maxRecords);
@@ -158,10 +168,7 @@ public class UploadImportSavePresenter
                         if (currentRecord == maxRecords || excelLoaderService.getWaitingHandler().isRunFinished()){
                             importComponent.notifyEnding(currentRecord +" records imported");
                         }
-                    }else{
-                        importComponent.notifyUploadingProgress(0, 0);
-                        importComponent.notifyEnding("no records available to be imported");
-                    }
+                    }// if maxRecords == 0, it may be that the importing procedure is still starting
                 }
                 
                 
@@ -205,6 +212,7 @@ public class UploadImportSavePresenter
      * @param dbLoaderComponent 
      */
     public void startDBLoading(DBLoadComponent dbLoaderComponent){
+        dataSaverService.initialiseDataStructures();
         UploadImportSavePresenter.DBLoadingDataThread thread = new UploadImportSavePresenter.DBLoadingDataThread(dbLoaderComponent);
         thread.start();
     }
@@ -258,30 +266,30 @@ public class UploadImportSavePresenter
 	public void run() {
             try {                
                 if (excelLoaderService.getStudies() == null 
-                        || excelLoaderService.getStudies().size() == 0
+                        || excelLoaderService.getStudies().isEmpty()
                         || excelLoaderService.getProteins() == null 
-                        || excelLoaderService.getProteins().size() == 0
+                        || excelLoaderService.getProteins().isEmpty()
                         || excelLoaderService.getDatasets() == null 
-                        || excelLoaderService.getDatasets().size() == 0
+                        || excelLoaderService.getDatasets().isEmpty()
                         || excelLoaderService.getDatasetProteins() == null  
-                        || excelLoaderService.getDatasetProteins().size() == 0
+                        || excelLoaderService.getDatasetProteins().isEmpty()
                         || excelLoaderService.getDatasetPeptides() == null 
-                        || excelLoaderService.getDatasetPeptides().size() == 0){
+                        || excelLoaderService.getDatasetPeptides().isEmpty()){
                     
                     String detailedError = "";
-                    if (excelLoaderService.getStudies() == null || excelLoaderService.getStudies().size() == 0 ) 
+                    if (excelLoaderService.getStudies() == null || excelLoaderService.getStudies().isEmpty() ) 
                         detailedError = "Studies information not present.\n";
-                    if (excelLoaderService.getProteins() == null || excelLoaderService.getProteins().size() == 0) 
+                    if (excelLoaderService.getProteins() == null || excelLoaderService.getProteins().isEmpty()) 
                         detailedError += "Proteins information not present.\n";
-                    if (excelLoaderService.getDatasets() == null || excelLoaderService.getDatasets().size() == 0) 
+                    if (excelLoaderService.getDatasets() == null || excelLoaderService.getDatasets().isEmpty()) 
                         detailedError += "StudyDataset information not present.\n";
-                    if (excelLoaderService.getDatasetProteins() == null || excelLoaderService.getDatasetProteins().size() == 0) 
+                    if (excelLoaderService.getDatasetProteins() == null || excelLoaderService.getDatasetProteins().isEmpty()) 
                         detailedError += "DatasetProteins information not present.\n";
-                    if (excelLoaderService.getDatasetPeptides() == null || excelLoaderService.getDatasetPeptides().size() == 0) 
+                    if (excelLoaderService.getDatasetPeptides() == null || excelLoaderService.getDatasetPeptides().isEmpty()) 
                         detailedError += "Peptides information not present.";
                                        
                     dbLoaderComponent.notifyUploadingError("Imported data misses some key information", detailedError);
-                    //diseasesComparisonUpdaterService.updateComparisons();
+                    //diseasesComparisonUpdaterService.updateComparisonsView();
 
                 }else{      
                     dbLoadingTimerMonitoring = startDBLoadingTimerMonitoring(dbLoaderComponent);
@@ -292,7 +300,7 @@ public class UploadImportSavePresenter
                             excelLoaderService.getDatasetProteins(),
                             excelLoaderService.getDatasetPeptides());
                     
-                    //diseasesComparisonUpdaterService.updateComparisons();
+                    diseasesComparisonUpdaterService.updateComparisonsView();
                     
                 }
             } finally {

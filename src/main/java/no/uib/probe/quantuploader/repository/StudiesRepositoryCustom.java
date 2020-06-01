@@ -2,6 +2,7 @@ package no.uib.probe.quantuploader.repository;
 
 import com.compomics.util.waiting.WaitingHandler;
 import java.util.HashMap;
+import java.util.List;
 import no.uib.probe.quantuploader.beans.QuantStudyBean;
 import no.uib.probe.quantuploader.beans.QuantDatasetBean;
 import no.uib.probe.quantuploader.beans.QuantDatasetPeptideBean;
@@ -47,4 +48,7 @@ public interface StudiesRepositoryCustom  {
     QuantDatasetBean getDatasetByLogicId(String studyKey, String sampleType, String sampleMatching,
             String normalizationStrategy, String patientsGroup1, String patientsGroup2,
             String patientsSubgroup1, String patientsSubgroup2);
+    
+    
+    List<Long> getDatasetDBIdsByDiseases(String diseaseGroupAcronym, String diseaseAcronym1, String diseaseAcronym2);
 }

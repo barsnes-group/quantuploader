@@ -9,9 +9,11 @@ import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -22,7 +24,7 @@ import no.uib.probe.quantuploader.enums.DiseaseCategory;
  * this class represent the publication study object that has all publication
  * information
  *
- * @author Yehia Farag
+ * @author Carlos Horro
  */
 @Entity
 public class QuantStudyBean implements Serializable, Comparable, Identifiable  {
@@ -39,6 +41,10 @@ public class QuantStudyBean implements Serializable, Comparable, Identifiable  {
     private boolean pooledSample;
     @Enumerated(EnumType.STRING)
     private DiseaseCategory diseaseCategory;
+    //@JoinColumn(foreignKey = @ForeignKey(name = "diseasegroupid_ibfk_1"), table="disease_groups",
+    //        referencedColumnName = "id")
+    /* Acronym must be set up using DiseaseGroupBean acronyms */
+    private String diseaseGroupAcronym;
     private String author;
     private Integer year;
     private Integer quantifiedProteinsNumber;
@@ -57,7 +63,6 @@ public class QuantStudyBean implements Serializable, Comparable, Identifiable  {
     
     @Transient
     private final HashMap<String,QuantDatasetBean> quantDatasetMap = new HashMap<String,QuantDatasetBean>();
-
     
     
     /**
@@ -136,20 +141,14 @@ public class QuantStudyBean implements Serializable, Comparable, Identifiable  {
     
 
 
-    /*
-    public Object[] getValues() {
-        return values;
+    public String getDiseaseGroupAcronym() {
+        return diseaseGroupAcronym;
     }
-    private final Object[] values = new Object[29];
-    private final Map<String, Object> valuesMap = new HashMap<String, Object>();
-    private String uniqueValues;
-    */
-    /*
-    private final String[] headers = new String[]{"Author", "Year", "#Identified Proteins", "#Quantified Proteins", "Disease Groups", "Raw Data", "#Files", "Study Type", "Sample Type", "Sample Matching", "Shotgun/Targeted", "Technology", "Analytical Approach", "Enzyme", "Quantification Basis", "Quantification Basis Comment","Normalization Strategy", "PumedID","Patients Gr.I", "#Patients Gr.I", "Patients Gr.I Comments", "Patients Sub-Gr.I", "Patients Gr.II","#Patients Gr.II", "Patients Gr.II Comments", "Patients Sub-Gr.II", "Additional Comments","studyKey"};
 
-    public String getFilterTitle(int index) {
-        return headers[index];
-    }*/
+    public void setDiseaseGroupAcronym(String diseaseGroupAcronym) {
+        this.diseaseGroupAcronym = diseaseGroupAcronym;
+    }
+
 
     public String getAuthor() {
         return author;
