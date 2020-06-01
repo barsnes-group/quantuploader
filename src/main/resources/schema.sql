@@ -40,6 +40,6 @@ CREATE TABLE IF NOT EXISTS `diseases` (
   `disease_group` int NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (disease_group) REFERENCES disease_groups(id),
-  UNIQUE KEY `min_UNIQUE` (`min`),
+  --UNIQUE KEY `min_UNIQUE` (`min`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
